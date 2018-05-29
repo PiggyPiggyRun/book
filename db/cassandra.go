@@ -22,9 +22,9 @@ func main() {
 	session, _ := cluster.CreateSession()
 	defer session.Close()
 
-	// generate a unique id for the user
+	// generate a unique id for the employee
 	id := gocql.TimeUUID()
-	// create the user in memory
+	// create the employee in memory
 	newEmployee := User{
 		Id:        id,
 		FirstName: "James",
@@ -32,7 +32,7 @@ func main() {
 		Age:       45,
 	}
 
-	// insert the user
+	// insert the employee
 	if err := session.Query("INSERT INTO employees (id, firstname, lastname, age ) VALUES (?, ?, ?, ?)",
 		newEmployee.Id,
 		newEmployee.FirstName,
@@ -42,7 +42,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Use select to get the user we just entered
+	// Use select to get the employee we just entered
 	var userFromDB User
 
 	if err := session.Query("SELECT id, firstname,  lastname, age FROM employees WHERE id=?", id).
