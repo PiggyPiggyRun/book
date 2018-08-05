@@ -60,8 +60,8 @@ func makeId(res *HotelReservationDTO) string {
 	// NOTE : for uniquess, non-overlapping reservations, there should be another explicit check
 	return fmt.Sprintf("%v#%v#%v", res.EntityId, res.RoomId, res.CheckIn)
 }
-func persistReservation(res *HotelReservationDTO) error {
 
+func persistReservation(res *HotelReservationDTO) error {
 	// Note the use of tx as the database handle once you are within a transaction
 	tx := db.Begin()
 	defer func() {
@@ -103,14 +103,14 @@ func persistReservation(res *HotelReservationDTO) error {
 	// And availability >0 in thresholds DB is not a guarantee of reservation certainity.
 	if threshold.Availability <= 1 {
 		// we have reached threshold
-		sendMessageToInvalidateCatalog(threshold.EntityId, threshold.RoomId)
+		sendInvaliationMessageToPriceStore(threshold.EntityId, threshold.RoomId)
 
 	}
 
 	return tx.Commit().Error
 }
 
-func sendMessageToInvalidateCatalog(eid, rid uint) {
+func sendInvaliationMessageToPriceStore(eid, rid uint) {
 	fmt.Println("sending message to invalide catalog for entity id ", eid, " room id ", rid)
 }
 

@@ -78,7 +78,7 @@ func handleCreateBookingMessage(consumer *cluster.Consumer) {
 
 					// TODO make actual booking with seller
 
-					// update status ins DB
+					// update status in DB
 					updateReservationStatus(&reservationDTO, BookingMade)
 
 					fmt.Printf("processed create booking message %s-%d-%d-%s-%s\n",
