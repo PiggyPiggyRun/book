@@ -7,8 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
-	"strings"
-	"time"
 )
 
 var (
@@ -40,37 +38,9 @@ func main() {
 	v1 := router.Group("/v1/hotels/reservation")
 	{
 		v1.POST("/", createReservation)
-		/*	v1.GET("/:id", getReservationDetails)
-			v1.PUT("/:id", updateReservation)
-			v1.DELETE("/:id", archiveReservation)*/
+
 	}
 	router.Run()
-}
-
-const reservationDateFormat = "2006-01-02"
-
-type ReservationTime time.Time
-
-func (t *ReservationTime) UnmarshalJSON(bytes []byte) error {
-	rawT, err := time.Parse(reservationDateFormat, strings.Replace(
-		string(bytes),
-		"\"",
-		"",
-		-1,
-	))
-
-	if err != nil {
-		return err
-	}
-
-	*t = ReservationTime(rawT)
-
-	return nil
-}
-
-func (t *ReservationTime) MarshalJSON() ([]byte, error) {
-	buf := fmt.Sprintf("\"%s\"", time.Time(*t).Format(reservationDateFormat))
-	return []byte(buf), nil
 }
 
 type HotelReservationDTO struct {
