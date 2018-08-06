@@ -46,7 +46,7 @@ func main() {
 type HotelReservationDTO struct {
 	CustomerId        uint            `json:"customer_id" `
 	PaymentIdentifier uint            `json:"payment_identifier" `
-	EntityId          uint            `json:"entity_id" `
+	SKU               uint            `json:"entity_id" `
 	RoomId            uint            `json:"room_id" `
 	CheckIn           ReservationTime `json:"check_in" gorm:"type:datetime"`
 	CheckOut          ReservationTime `json:"check_out" gorm:"type:datetime"`

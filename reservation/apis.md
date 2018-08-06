@@ -4,7 +4,7 @@
 CREATE TABLE hotel_reservations (
   customer_id int,
   payment_identifier int,
-  entity_id int,
+  sku int,
   room_id int,
   check_in datetime,
   check_out datetime,
@@ -14,5 +14,5 @@ CREATE TABLE hotel_reservations (
 );
 
 # create booking api
-curl -d '{"customer_id": 999, "payment_identifier": 66, "entity_id":1, "room_id": 2, "check_in" : "2018-12-07" , "check_out" : "2018-12-08"}' -H "Content-Type: application/json"  -X POST 127.0.0.1:8080/v1/hotels/reservation/
+curl -d '{"customer_id": 999, "payment_identifier": 66, "sku":1, "room_id": 2, "check_in" : "2018-12-07" , "check_out" : "2018-12-08"}' -H "Content-Type: application/json"  -X POST 127.0.0.1:8080/v1/hotels/reservation/
 

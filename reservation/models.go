@@ -20,7 +20,7 @@ type HotelReservation struct {
 	//HotelReservationDetails `gorm:"embedded"`
 	CustomerId        uint      `json:"customer_id" `
 	PaymentIdentifier uint      `json:"payment_identifier" `
-	EntityId          uint      `json:"entity_id" `
+	SKU               uint      `json:"entity_id" `
 	RoomId            uint      `json:"room_id" `
 	CheckIn           time.Time `json:"check_in" gorm:"type:datetime"`
 	CheckOut          time.Time `json:"check_out" gorm:"type:datetime"`
@@ -30,7 +30,7 @@ type HotelReservation struct {
 
 type AvailabilityThreshold struct {
 	gorm.Model
-	EntityId     uint
+	SKU          uint
 	RoomId       uint
 	Availability int
 }
@@ -51,14 +51,14 @@ func init() {
 	db.AutoMigrate(&AvailabilityThreshold{})
 
 	// dummy thresholds
-	db.Create(&AvailabilityThreshold{EntityId: 1, RoomId: 2, Availability: 3})
+	db.Create(&AvailabilityThreshold{SKU: 1, RoomId: 2, Availability: 3})
 
 }
 
-// generates ID for the reservation from entityid, roomid and checkin date
+// generates ID for the reservation from SKU, roomid and checkin date
 func makeId(res *HotelReservationDTO) string {
 	// NOTE : for uniquess, non-overlapping reservations, there should be another explicit check
-	return fmt.Sprintf("%v#%v#%v", res.EntityId, res.RoomId, res.CheckIn)
+	return fmt.Sprintf("%v#%v#%v", res.SKU, res.RoomId, res.CheckIn)
 }
 
 func persistReservation(res *HotelReservationDTO) error {
@@ -79,7 +79,7 @@ func persistReservation(res *HotelReservationDTO) error {
 	if err := tx.Create(&HotelReservation{
 		CustomerId:        res.CustomerId,
 		PaymentIdentifier: res.PaymentIdentifier,
-		EntityId:          res.EntityId,
+		SKU:               res.SKU,
 		RoomId:            res.RoomId,
 		CheckIn:           time.Time(res.CheckIn),
 		CheckOut:          time.Time(res.CheckOut),
@@ -93,7 +93,7 @@ func persistReservation(res *HotelReservationDTO) error {
 
 	// update the entry for availability threshold
 	var threshold AvailabilityThreshold
-	tx.Where("entity_id = ? AND room_id = ?", res.EntityId, res.RoomId).First(&threshold)
+	tx.Where("entity_id = ? AND room_id = ?", res.SKU, res.RoomId).First(&threshold)
 
 	fmt.Printf("\nthreshold = %+v\n", threshold)
 	tx.Model(&threshold).Where("id = ?", threshold.ID).Update("availability", threshold.Availability-1)
@@ -103,7 +103,7 @@ func persistReservation(res *HotelReservationDTO) error {
 	// And availability >0 in thresholds DB is not a guarantee of reservation certainity.
 	if threshold.Availability <= 1 {
 		// we have reached threshold
-		sendInvaliationMessageToPriceStore(threshold.EntityId, threshold.RoomId)
+		sendInvaliationMessageToPriceStore(threshold.SKU, threshold.RoomId)
 
 	}
 
