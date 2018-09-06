@@ -7,7 +7,8 @@ import (
 	"github.com/gocql/gocql"
 )
 
-// Employee struct
+// User desscribes an employee entity.
+// We will be using this to demonstrate Cassandra create, read, update, and delete flows
 type User struct {
 	Id        gocql.UUID
 	FirstName string
