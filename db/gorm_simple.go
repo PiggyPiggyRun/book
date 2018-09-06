@@ -20,18 +20,22 @@ func main() {
 	}
 	defer db.Close()
 
-	// Migrate the schema
+	// Automigrate the schema
+	// Here gorm uses reflection to get to the struct and field names and then maps them to table and column names using
+	// either the tags or the described convention
 	db.AutoMigrate(&User{})
 
-	// Create
+	// Create an entity for the purpose of this test
 	db.Create(&User{Name: "James Bond", Age: 40})
 
 	// Read
+	// Find an user with id 1
 	var user User
-	db.First(&user, 1) // find user with id 1
+	db.First(&user, 1)
 	fmt.Println(user)
 
-	db.First(&user, "Name = ?", "James Bond") // find James Bond
+	// Find an user with a specific name : James Bond
+	db.First(&user, "Name = ?", "James Bond")
 	fmt.Println(user)
 
 	// Update - update Bond's age
@@ -41,6 +45,8 @@ func main() {
 	// Delete - delete user
 	db.Delete(&user)
 
+	// Transactions demo
+	// Transactions allows the application code to assume atomicity from the database over multiple DB operations
 	createTwoUsers(db)
 }
 
@@ -48,14 +54,18 @@ func createTwoUsers(db *gorm.DB) {
 	userA := User{Name: "UserA", Age: 20}
 	userB := User{Name: "UserB", Age: 20}
 
+	// Starts a trasaction
+	// Tx is the handle which identifies the newly started transaction
 	tx := db.Begin()
 	if err := tx.Create(&userA).Error; err != nil {
+		// Rollback causes the transaction to abort and bring the database to the consistent state before the
+		// transaction was initiated
 		tx.Rollback()
 	}
 	if err := tx.Create(&userB).Error; err != nil {
 		tx.Rollback()
 	}
 
-	//commit!
+	// Commit the transaction
 	tx.Commit()
 }
